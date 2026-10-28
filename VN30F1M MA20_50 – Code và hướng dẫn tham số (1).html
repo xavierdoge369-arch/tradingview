@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VN30F1M MA20/50 – Code và hướng dẫn tham số</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#f6f7f4;--surface:#fff;--ink:#16212b;--mute:#55636f;--line:#d9dfe0;--up:#0b7a5a;--down:#c2412d;--accent:#1f4e79;--codebg:#0f1a24;--codeink:#d8e4ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10181f;--surface:#17222b;--ink:#e6edf2;--mute:#9aaab7;--line:#2a3945;--up:#3fc79a;--down:#f0836f;--accent:#7db4e6;--codebg:#0a1118}}
+:root[data-theme="dark"]{--bg:#10181f;--surface:#17222b;--ink:#e6edf2;--mute:#9aaab7;--line:#2a3945;--up:#3fc79a;--down:#f0836f;--accent:#7db4e6;--codebg:#0a1118}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "Be Vietnam Pro",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:28px 18px 64px}
+h1{font-size:clamp(1.6rem,4vw,2.3rem);line-height:1.2;margin:0 0 10px}
+h2{font-size:1.35rem;margin:44px 0 10px;padding-top:14px;border-top:2px solid var(--ink)}
+h3{font-size:1.05rem;margin:26px 0 6px}
+p{margin:8px 0;max-width:70ch}
+.lead{color:var(--mute);font-size:1.05rem}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+nav a{color:var(--accent);border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:6px;text-decoration:none;font-size:.92rem}
+nav a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.codewrap{position:relative;margin:14px 0;border-radius:8px;overflow:hidden;background:var(--codebg)}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;color:#9fb3c4;font-size:.85rem;border-bottom:1px solid #22313d}
+button{font:inherit;font-size:.9rem;font-weight:500;background:var(--up);color:#fff;border:0;border-radius:6px;padding:7px 16px;cursor:pointer}
+:root[data-theme="dark"] button{color:#06241b}
+pre{margin:0;padding:14px;overflow-x:auto;max-height:520px;overflow-y:auto;color:var(--codeink);font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;tab-size:4}
+.tw{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;min-width:520px;background:var(--surface);font-size:.94rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+code{font:.88em ui-monospace,Menlo,Consolas,monospace;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:1px 5px;border-radius:4px}
+figure{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{color:var(--mute);font-size:.88rem;padding:6px 4px 2px}
+.note{border-left:4px solid var(--down);background:var(--surface);padding:10px 14px;margin:14px 0}
+.note ul{margin:6px 0 0;padding-left:20px}
+.t{fill:var(--ink);font:12px "Be Vietnam Pro",system-ui,sans-serif}
+.m{fill:var(--mute);font:11px "Be Vietnam Pro",system-ui,sans-serif}
+</style>
+</head>
+<body>
+<main>
+<h1>Chiến lược VN30F1M khung 1 phút: MA20/50 cắt nhau</h1>
+<p class="lead">Mã Pine Script v5 để dán vào TradingView, kèm hướng dẫn từng tham số và hình minh họa ví dụ. Với phái sinh VN30F1M, đơn vị là điểm chỉ số (1 điểm = 100.000 VND mỗi hợp đồng). Với cổ phiếu, mã tự nhận biết và chuyển sang phần trăm.</p>
+<nav><a href="#code">Mã nguồn</a><a href="#cach">Cách hoạt động</a><a href="#thamso">Tham số</a><a href="#vidu">Ví dụ có hình</a><a href="#thu">Bộ tham số để thử</a><a href="#luuy">Lưu ý</a></nav>
+
+<h2 id="code">1. Mã nguồn</h2>
+<p>Mở Pine Editor trong TradingView, xóa nội dung cũ, dán mã rồi bấm Add to chart.</p>
+<div class="codewrap">
+<div class="bar"><span>vn30f1m_ma_cross.pine</span><button id="cp" type="button">Sao chép mã</button></div>
+<pre id="pre" tabindex="0"></pre>
+</div>
+
+<h2 id="cach">2. Cách hoạt động</h2>
+<p>Khi nến đóng cửa mà MA nhanh cắt lên MA chậm thì vào Long, cắt xuống thì vào Short. Lệnh khớp ở giá mở cửa nến kế tiếp. Ngay sau khi khớp, SL và TP được tính từ giá khớp thực tế. Nếu bật trailing, SL được nâng dần khi lời tăng. Chiến lược chỉ giữ một lệnh mỗi lần và đóng hết lệnh cuối phiên.</p>
+
+<h2 id="thamso">3. Tham số</h2>
+<h3>Tín hiệu</h3>
+<div class="tw"><table><tr><th>Tham số</th><th>Mặc định</th><th>Ý nghĩa và cách chỉnh</th></tr>
+<tr><td>MA nhanh / MA chậm</td><td>20 / 50</td><td>Chu kỳ hai đường MA. Cặp nhỏ như 10/30 cho nhiều tín hiệu nhưng nhiễu hơn, cặp lớn như 30/100 ít lệnh hơn.</td></tr>
+<tr><td>Loại MA</td><td>SMA</td><td>SMA, EMA hoặc WMA. EMA phản ứng nhanh hơn SMA.</td></tr></table></div>
+
+<h3>Quản lý lệnh</h3>
+<div class="tw"><table><tr><th>Tham số</th><th>Mặc định</th><th>Ý nghĩa và cách chỉnh</th></tr>
+<tr><td>Kiểu SL</td><td>Điểm cố định</td><td>“Điểm cố định”: SL cách giá khớp đúng số điểm đã đặt. “Đỉnh/đáy N nến”: Long đặt SL ở đáy thấp nhất của N nến trước tín hiệu, Short ở đỉnh cao nhất.</td></tr>
+<tr><td>Số nến</td><td>9</td><td>Chỉ dùng khi SL theo nến.</td></tr>
+<tr><td>SL (điểm)</td><td>2</td><td>Chỉ dùng khi SL cố định. Ví dụ 2 thì Long khớp 1.500 có SL 1.498.</td></tr>
+<tr><td>R:R</td><td>4</td><td>TP = khoảng cách SL × R:R. SL 2 điểm và R:R 4 cho TP 8 điểm.</td></tr>
+<tr><td>SL tối thiểu / tối đa</td><td>0,5 / 0 (tắt)</td><td>Chỉ dùng khi SL theo nến. Bỏ qua lệnh nếu khoảng SL ước tính nằm ngoài khoảng này.</td></tr></table></div>
+
+<h3>Trailing (nâng SL theo bậc)</h3>
+<div class="tw"><table><tr><th>Tham số</th><th>Mặc định</th><th>Ý nghĩa và cách chỉnh</th></tr>
+<tr><td>Bật trailing</td><td>Bật</td><td>Bật hoặc tắt toàn bộ chức năng.</td></tr>
+<tr><td>Kích hoạt khi lời</td><td>2</td><td>Khi lời tối đa đạt mức này, SL được nâng lần đầu.</td></tr>
+<tr><td>Khóa lời lần đầu</td><td>0</td><td>SL lần đầu = giá vào ± số này. 0 là hòa vốn. Đặt 0,3 đến 0,5 để bù phí.</td></tr>
+<tr><td>Bước nâng</td><td>2</td><td>Cứ lời thêm mỗi bước này thì SL nâng thêm đúng một bước. Nhỏ thì bám sát giá nhưng dễ bị quét.</td></tr>
+<tr><td>Bỏ TP khi trailing</td><td>Tắt</td><td>Bật thì không có TP cố định, lệnh chỉ thoát khi SL (đã nâng) bị chạm hoặc cuối phiên.</td></tr></table></div>
+
+<h3>Đơn vị: điểm hay phần trăm (tự nhận cổ phiếu)</h3>
+<p>Mã đọc loại sản phẩm của biểu đồ. Nếu là cổ phiếu (<code>stock</code>) thì SL và trailing tính theo phần trăm giá vào. Với phái sinh hoặc chỉ số thì dùng điểm như trước. Tại thời điểm vào lệnh, phần trăm được quy ra điểm giá và giữ nguyên suốt lệnh đó.</p>
+<div class="tw"><table><tr><th>Tham số</th><th>Mặc định</th><th>Ý nghĩa và cách chỉnh</th></tr>
+<tr><td>Đơn vị SL/trailing</td><td>Tự động</td><td>Tự động: cổ phiếu dùng %, loại khác dùng điểm. Chọn “Điểm” hoặc “Phần trăm” để ép dùng một đơn vị cho mọi loại. Nếu sàn dữ liệu gắn nhãn khác (ví dụ chỉ số hoặc CFD), hãy ép bằng tay.</td></tr>
+<tr><td>Tự tắt Short khi là cổ phiếu</td><td>Bật</td><td>Cổ phiếu Việt Nam không bán khống, nên chỉ chạy Long.</td></tr>
+<tr><td>SL (%)</td><td>0,5</td><td>Dùng khi SL cố định ở chế độ phần trăm.</td></tr>
+<tr><td>SL tối thiểu / tối đa (%)</td><td>0,1 / 0 (tắt)</td><td>Bộ lọc cho SL theo nến, tính theo % giá đóng cửa nến tín hiệu.</td></tr>
+<tr><td>Trailing: kích hoạt / khóa lời / bước (%)</td><td>0,5 / 0 / 0,5</td><td>Giống ba tham số trailing bằng điểm nhưng tính theo %.</td></tr>
+<tr><td>Vốn mỗi lệnh (VND)</td><td>100.000.000</td><td>Chỉ dùng ở chế độ phần trăm (cổ phiếu). Khối lượng = vốn / giá, làm tròn xuống theo lô. Vốn cố định mỗi lệnh, không cộng dồn lãi lỗ.</td></tr>
+<tr><td>Lô giao dịch</td><td>100</td><td>Khối lượng được làm tròn xuống bội số của lô này.</td></tr>
+<tr><td colspan="3">Phái sinh (chế độ điểm) luôn vào <strong>1 hợp đồng</strong> như cũ. Muốn đổi số hợp đồng thì chỉnh Order size trong Properties.</td></tr></table></div>
+<p><strong>Ví dụ cổ phiếu:</strong> Long khớp 25.000 VND, SL 0,5%, R:R 4. Khoảng SL = 125 VND nên SL = 24.875 và TP = 25.000 + 125 × 4 = 25.500. Trailing kích hoạt khi lời 0,5% (125 VND): giá cao nhất chạm 25.125 thì SL lên 25.000 (hòa vốn), chạm 25.250 thì SL lên 25.125, và cứ thế mỗi bước 125 VND. R:R dùng chung cho cả hai chế độ.</p>
+<p><strong>Khối lượng cổ phiếu:</strong> vốn 100.000.000, giá 25.000 thì mua 100.000.000 / 25.000 = 4.000 cổ phiếu (đã khớp lô 100). Nếu SL 0,5% thì lỗ tối đa khoảng 125 × 4.000 = 500.000 VND, và TP 500 VND mỗi cổ phiếu cho lời khoảng 2.000.000 VND. Khối lượng tính theo giá đóng cửa nến tín hiệu nên có thể lệch nhẹ so với giá khớp thực tế.</p>
+
+
+<h3>Hướng lệnh và thời gian</h3>
+<div class="tw"><table><tr><th>Tham số</th><th>Mặc định</th><th>Ý nghĩa và cách chỉnh</th></tr>
+<tr><td>Cho phép Long / Short</td><td>Bật / Bật</td><td>Tắt một chiều nếu chỉ muốn giao dịch theo hướng đó.</td></tr>
+<tr><td>Chỉ vào lệnh trong phiên</td><td>Bật</td><td>Chỉ nhận tín hiệu trong khung giờ phiên bên dưới.</td></tr>
+<tr><td>Phiên vào lệnh</td><td>0900-1425</td><td>Giờ GMT+7. Ví dụ đổi thành 0915-1425 để tránh nhiễu đầu phiên.</td></tr>
+<tr><td>Đóng lệnh cuối phiên / khung giờ</td><td>Bật / 1440-1445</td><td>Tự đóng lệnh còn mở trong khung giờ này.</td></tr></table></div>
+
+<h3>Phí, thuế và vốn (mã tự nhận theo loại sản phẩm)</h3>
+<p>Phần Commission trong Properties của TradingView chỉ có một kiểu cố định và áp cùng mức cho hai chiều, không thể tự đổi theo chart. Vì vậy mã tự tính phí và thuế riêng, dùng cùng cách nhận biết cổ phiếu hay phái sinh như SL và khối lượng, rồi xuất hai giá trị <strong>Lãi ròng sau phí</strong> và <strong>Tổng phí + thuế</strong> trong Data Window (cửa sổ dữ liệu bên phải), cộng dồn theo các lệnh đã đóng.</p>
+<p>Lưu ý: Strategy Tester của TradingView vẫn hiển thị theo Commission trong Properties, không gồm phí của mã. Hãy đặt Commission = 0 để tránh nhầm, và đọc lãi ròng ở Data Window. Nếu chart đã lưu 0,3 percent từ trước, bấm Defaults hoặc gỡ rồi thêm lại chiến lược.</p>
+<div class="tw"><table><tr><th>Mục</th><th>Cổ phiếu</th><th>Phái sinh VN30F1M</th></tr>
+<tr><td>Phí và thuế trong mã</td><td>Mua 0,3% + bán 0,3% + thuế bán 0,1% = 0,7% cả vòng</td><td>0,5 điểm (50.000 VND) mỗi hợp đồng cả vòng</td></tr>
+<tr><td>Tham số trong nhóm Phí &amp; thuế</td><td>CP: phí mỗi chiều 0,3 và CP: thuế bán 0,1</td><td>Phái sinh: phí + thuế cả vòng 0,5 và VND mỗi điểm 100.000</td></tr>
+<tr><td>Initial capital</td><td>100.000.000</td><td>100.000.000</td></tr>
+<tr><td>Khối lượng mỗi lệnh</td><td>Mã tự tính theo vốn và lô (bỏ qua Order size)</td><td>1 hợp đồng (Order size = 1)</td></tr>
+<tr><td>Commission trong Properties</td><td>0</td><td>0</td></tr>
+<tr><td>Slippage</td><td>1 đến 2 tick</td><td>1 đến 2 tick</td></tr></table></div>
+<p><strong>Ví dụ cổ phiếu:</strong> mua 4.000 cổ phiếu giá 25.000 (100.000.000), bán ở 25.500 (102.000.000). Lãi gộp 2.000.000. Phí mua 300.000, phí bán 306.000, thuế bán 102.000, tổng 708.000. Lãi ròng 1.292.000 VND.</p>
+<p><strong>Ví dụ phái sinh:</strong> 1 hợp đồng lời 8 điểm = 800.000 VND, trừ 0,5 điểm phí và thuế (50.000) còn 750.000 VND. Nếu lỗ 2 điểm thì lỗ thực tế là 2,5 điểm (250.000 VND).</p>
+
+<h2 id="vidu">4. Ví dụ có hình</h2>
+<h3>Ví dụ 1: SL cố định và TP theo R:R</h3>
+<p>Cài SL 2 điểm, R:R 4. Lệnh Long khớp ở 1.500: SL 1.498, TP 1.508. Lỗ tối đa 2 điểm (200.000 VND), lời tối đa 8 điểm (800.000 VND), chưa tính phí. Lệnh Short khớp ở 1.500 thì ngược lại: SL 1.502, TP 1.492.</p>
+<figure>
+<svg viewBox="0 0 640 240" role="img" aria-label="Lệnh Long khớp 1.500 với SL 1.498 và TP 1.508">
+<rect x="60" y="30" width="470" height="110" fill="var(--up)" opacity=".16"/>
+<rect x="60" y="140" width="470" height="28" fill="var(--down)" opacity=".18"/>
+<line x1="60" y1="30" x2="530" y2="30" stroke="var(--up)" stroke-width="2"/>
+<line x1="60" y1="140" x2="530" y2="140" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 4"/>
+<line x1="60" y1="168" x2="530" y2="168" stroke="var(--down)" stroke-width="2"/>
+<text class="t" x="540" y="34">TP 1.508</text>
+<text class="t" x="540" y="144">Vào 1.500</text>
+<text class="t" x="540" y="172">SL 1.498</text>
+<text class="t" x="70" y="88">Vùng lời: 8 điểm</text>
+<text class="t" x="70" y="158">Vùng lỗ: 2 điểm</text>
+<path d="M120 140 L180 124 L240 132 L300 96 L360 70 L420 52 L480 30" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+<text class="m" x="60" y="205">Đường giá minh họa chạm TP sau khi đi đúng hướng. Tỷ lệ lời : lỗ = 4 : 1.</text>
+</svg>
+<figcaption>Long khớp 1.500, SL 2 điểm, R:R 4.</figcaption>
+</figure>
+
+<h3>Ví dụ 2: Trailing với bộ mặc định</h3>
+<p>Kích hoạt 2, khóa lời 0, bước 2. Long khớp 1.500. Khi giá cao nhất đạt 1.502, SL lên 1.500 (hòa vốn). Đạt 1.504 thì SL lên 1.502, đạt 1.506 thì SL lên 1.504. Nếu giá quay đầu sau khi chạm 1.506, lệnh thoát ở 1.504 và vẫn lời 4 điểm thay vì lỗ.</p>
+<figure>
+<svg viewBox="0 0 640 250" role="img" aria-label="SL nâng theo bậc khi giá tăng">
+<g stroke="var(--line)" stroke-width="1"><line x1="40" y1="172" x2="470" y2="172"/><line x1="40" y1="144" x2="470" y2="144"/><line x1="40" y1="116" x2="470" y2="116"/><line x1="40" y1="88" x2="470" y2="88"/><line x1="40" y1="60" x2="470" y2="60"/></g>
+<text class="m" x="475" y="176">1.498</text><text class="m" x="475" y="148">1.500</text><text class="m" x="475" y="120">1.502</text><text class="m" x="475" y="92">1.504</text><text class="m" x="475" y="64">1.506</text>
+<polyline points="40,144 100,130 160,113 220,95 280,60 340,74 400,88" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+<path d="M40 172 H160 V144 H280 V88 H400" fill="none" stroke="var(--down)" stroke-width="2.5" stroke-dasharray="7 4"/>
+<circle cx="400" cy="88" r="5" fill="var(--down)"/>
+<text class="t" x="50" y="190">SL ban đầu 1.498</text>
+<text class="t" x="165" y="160">SL lên hòa vốn 1.500</text>
+<text class="t" x="285" y="108">SL lên 1.504</text>
+<text class="t" x="296" y="50">Giá cao nhất 1.506</text>
+<text class="t" x="330" y="128">Thoát 1.504: lời 4 điểm</text>
+<text class="m" x="40" y="225">Nét liền: đường giá. Nét đứt đỏ: SL. SL chỉ nâng lên, không bao giờ hạ xuống.</text>
+</svg>
+<figcaption>SL nâng theo bậc 2 điểm sau khi lời đạt 2 điểm.</figcaption>
+</figure>
+
+<h3>Ví dụ 3: SL theo đáy 9 nến</h3>
+<p>Kiểu SL là Đỉnh/đáy N nến, R:R 1,5. Đáy thấp nhất của 9 nến trước tín hiệu là 1.496,5 và Long khớp ở 1.500. Khoảng SL = 3,5 điểm, TP = 1.500 + 3,5 × 1,5 = 1.505,25. Mỗi lệnh có độ rủi ro khác nhau vì phụ thuộc vào biên độ 9 nến gần nhất.</p>
+
+<h2 id="thu">5. Bộ tham số để thử</h2>
+<div class="tw"><table><tr><th>Phong cách</th><th>SL</th><th>R:R</th><th>Kích hoạt</th><th>Khóa lời</th><th>Bước</th></tr>
+<tr><td>Mặc định (rất sát)</td><td>2</td><td>4</td><td>2</td><td>0</td><td>2</td></tr>
+<tr><td>Bớt bị quét sớm</td><td>3</td><td>3</td><td>4</td><td>0,5</td><td>2</td></tr>
+<tr><td>Cân bằng</td><td>5</td><td>2</td><td>5</td><td>0,5</td><td>2,5</td></tr>
+<tr><td>Gồng xu hướng (bật Bỏ TP)</td><td>5</td><td>3</td><td>7</td><td>1</td><td>3</td></tr></table></div>
+<p>Đây là điểm khởi đầu để backtest, không phải bộ tối ưu. Mỗi lần chỉ đổi một nhóm tham số rồi so sánh net profit, số lệnh, tỷ lệ thắng, max drawdown và profit factor, trên nhiều giai đoạn thị trường khác nhau.</p>
+
+<h2 id="luuy">6. Lưu ý</h2>
+<div class="note"><ul>
+<li>SL 2 điểm trên khung 1 phút rất sát: nhiễu, trượt giá và phí dễ làm kết quả thực tế kém hơn backtest.</li>
+<li>Kích hoạt trailing bằng đúng SL (2 và 2) khiến nhiều lệnh thoát hòa vốn trước khi tới TP. Nếu tỷ lệ thắng thấp, thử kích hoạt 3 đến 4 điểm hoặc khóa lời 0,3 đến 0,5.</li>
+<li>Trailing cập nhật theo nến đã đóng nên SL mới có hiệu lực từ nến kế tiếp, và nến khớp lệnh chưa có SL/TP khi backtest.</li>
+<li>Cổ phiếu Việt Nam giao dịch T+2, nên cổ phiếu mua hôm nay chưa bán được trong ngày. Backtest cổ phiếu khung 1 phút với SL/TP trong ngày chỉ có tính tham khảo. Nếu dùng để kiểm tra ý tưởng, hãy tắt “Đóng lệnh cuối phiên” hoặc dùng khung thời gian lớn hơn.</li>
+<li>Cross MA ở khung 1 phút nhiễu nhiều khi thị trường đi ngang. Có thể cân nhắc thêm bộ lọc xu hướng.</li>
+<li>Kết quả backtest không đảm bảo kết quả tương lai. Hãy chạy thử trên tài khoản demo và chỉ dùng số vốn bạn chấp nhận rủi ro.</li>
+</ul></div>
+</main>
+
+<script type="text/plain" id="src">//@version=5
+strategy("VN30F1M - MA20/50 Cross | SL nến/điểm | R:R | Trailing", overlay=true,
+         initial_capital=100000000, default_qty_type=strategy.fixed, default_qty_value=1,
+         commission_type=strategy.commission.percent, commission_value=0,
+         pyramiding=0, calc_on_every_tick=false, process_orders_on_close=false)
+
+// ===== INPUTS =====
+maFastLen = input.int(20, "MA nhanh", minval=1, group="Tín hiệu")
+maSlowLen = input.int(50, "MA chậm", minval=1, group="Tín hiệu")
+maType    = input.string("SMA", "Loại MA", options=["SMA", "EMA", "WMA"], group="Tín hiệu")
+
+slMode     = input.string("Điểm cố định", "Kiểu SL", options=["Đỉnh/đáy N nến", "Điểm cố định"], group="Quản lý lệnh")
+slLookback = input.int(9, "Số nến (nếu SL theo nến)", minval=1, group="Quản lý lệnh")
+slPoints   = input.float(2.0, "SL (điểm, nếu SL cố định)", minval=0.1, step=0.5, group="Quản lý lệnh")
+rr         = input.float(4.0, "R:R", minval=0.1, step=0.1, group="Quản lý lệnh")
+minSLpts   = input.float(0.5, "SL tối thiểu (điểm, chỉ SL theo nến)", minval=0.0, step=0.1, group="Quản lý lệnh")
+maxSLpts   = input.float(0.0, "SL tối đa (điểm, 0 = tắt, chỉ SL theo nến)", minval=0.0, step=0.1, group="Quản lý lệnh")
+
+// ===== ĐƠN VỊ: ĐIỂM hay PHẦN TRĂM =====
+unitMode      = input.string("Tự động", "Đơn vị SL/trailing", options=["Tự động", "Điểm", "Phần trăm"], group="Đơn vị",
+     tooltip="Tự động: cổ phiếu dùng %, các loại khác (phái sinh, chỉ số) dùng điểm")
+noShortStock  = input.bool(true, "Tự tắt Short khi là cổ phiếu", group="Đơn vị", tooltip="Cổ phiếu Việt Nam không bán khống được")
+slPct         = input.float(0.5, "SL (%, nếu dùng phần trăm)", minval=0.01, step=0.05, group="Đơn vị")
+minSLpct      = input.float(0.1, "SL tối thiểu (%, chỉ SL theo nến)", minval=0.0, step=0.05, group="Đơn vị")
+maxSLpct      = input.float(0.0, "SL tối đa (%, 0 = tắt, chỉ SL theo nến)", minval=0.0, step=0.05, group="Đơn vị")
+trailStartPct = input.float(0.5, "Trailing: kích hoạt khi lời (%)", minval=0.01, step=0.05, group="Đơn vị")
+lockPct       = input.float(0.0, "Trailing: khóa lời lần đầu (%)", step=0.05, group="Đơn vị")
+trailStepPct  = input.float(0.5, "Trailing: bước nâng (%)", minval=0.01, step=0.05, group="Đơn vị")
+stockCapital  = input.float(100000000, "Vốn mỗi lệnh khi dùng % / cổ phiếu (VND)", minval=1000000, step=1000000, group="Đơn vị",
+     tooltip="Khối lượng = vốn / giá, làm tròn xuống theo lô. Phái sinh luôn vào 1 hợp đồng")
+lotSize       = input.int(100, "Lô giao dịch (cổ phiếu)", minval=1, group="Đơn vị")
+
+isStock = syminfo.type == "stock"
+usePct  = unitMode == "Phần trăm" or (unitMode == "Tự động" and isStock)
+
+useTrail   = input.bool(true, "Bật trailing (nâng SL)", group="Trailing")
+trailStart = input.float(2.0, "Kích hoạt khi lời (điểm)", minval=0.1, step=0.5, group="Trailing",
+     tooltip="Khi lợi nhuận tối đa đạt mức này, SL được nâng lần đầu")
+lockPts    = input.float(0.0, "Khóa lời lần đầu (điểm, 0 = hòa vốn)", step=0.1, group="Trailing",
+     tooltip="SL nâng lên = giá vào + số điểm này. Nên đặt nhỉnh hơn 0 để bù phí")
+trailStep  = input.float(2.0, "Bước nâng (điểm)", minval=0.1, step=0.5, group="Trailing",
+     tooltip="Cứ lời thêm mỗi bước này thì SL nâng thêm đúng bước đó. Đặt nhỏ = bám sát giá")
+removeTP   = input.bool(false, "Bỏ TP khi trailing (gồng không giới hạn)", group="Trailing",
+     tooltip="Bật: không chốt lời cố định, chỉ thoát khi SL (đã nâng) bị chạm hoặc cuối phiên")
+
+allowLong  = input.bool(true, "Cho phép Long",  group="Hướng lệnh")
+allowShort = input.bool(true, "Cho phép Short", group="Hướng lệnh")
+
+useSession = input.bool(true, "Chỉ vào lệnh trong phiên", group="Thời gian")
+sessionStr = input.session("0900-1425", "Phiên vào lệnh (GMT+7)", group="Thời gian")
+closeEOD   = input.bool(true, "Đóng lệnh cuối phiên", group="Thời gian")
+closeTime  = input.session("1440-1445", "Khung giờ đóng lệnh", group="Thời gian")
+
+// ===== MA =====
+ma(src, len) =>
+    switch maType
+        "SMA" => ta.sma(src, len)
+        "EMA" => ta.ema(src, len)
+        "WMA" => ta.wma(src, len)
+
+maFast = ma(close, maFastLen)
+maSlow = ma(close, maSlowLen)
+plot(maFast, "MA nhanh", color=color.orange, linewidth=2)
+plot(maSlow, "MA chậm",  color=color.blue,   linewidth=2)
+
+// ===== TÍN HIỆU =====
+crossUp   = ta.crossover(maFast, maSlow)
+crossDown = ta.crossunder(maFast, maSlow)
+
+inSession   = not useSession or not na(time(timeframe.period, sessionStr, "Asia/Ho_Chi_Minh"))
+isCloseTime = closeEOD and not na(time(timeframe.period, closeTime, "Asia/Ho_Chi_Minh"))
+
+useCandleSL = slMode == "Đỉnh/đáy N nến"
+lowestPrev  = ta.lowest(low,  slLookback)[1]
+highestPrev = ta.highest(high, slLookback)[1]
+
+longRiskEst  = close - lowestPrev
+shortRiskEst = highestPrev - close
+minSLeff     = usePct ? minSLpct / 100.0 * close : minSLpts
+maxSLeff     = usePct ? maxSLpct / 100.0 * close : maxSLpts
+longRiskOK   = not useCandleSL or (longRiskEst  >= minSLeff and (maxSLeff == 0 or longRiskEst  <= maxSLeff))
+shortRiskOK  = not useCandleSL or (shortRiskEst >= minSLeff and (maxSLeff == 0 or shortRiskEst <= maxSLeff))
+
+longOK  = allowLong  and crossUp   and inSession and longRiskOK
+shortOK = allowShort and crossDown and inSession and shortRiskOK and not (noShortStock and isStock)
+
+// ===== VÀO LỆNH =====
+// Chế độ % (cổ phiếu): khối lượng theo vốn cố định. Phái sinh: qty = na -> dùng 1 hợp đồng mặc định
+stockQty = math.floor(stockCapital / close / lotSize) * lotSize
+qtyArg   = usePct ? float(stockQty) : na
+var float pendingSL = na
+var float slPrice   = na
+var float tpPrice   = na
+var float entryPx   = na
+var float bestPx    = na   // giá thuận lợi nhất kể từ khi vào lệnh
+var float trStartEff = na  // các ngưỡng trailing đã quy ra điểm giá tại lúc vào lệnh
+var float lockEff    = na
+var float stepEff    = na
+
+if longOK and strategy.position_size == 0 and (not usePct or stockQty > 0)
+    strategy.entry("Long", strategy.long, qty=qtyArg)
+    pendingSL := lowestPrev
+
+if shortOK and strategy.position_size == 0 and (not usePct or stockQty > 0)
+    strategy.entry("Short", strategy.short, qty=qtyArg)
+    pendingSL := highestPrev
+
+// ===== TÍNH SL/TP THEO GIÁ KHỚP THỰC TẾ =====
+newTrade = strategy.position_size != 0 and strategy.position_size[1] == 0
+if newTrade
+    entryPx := strategy.position_avg_price
+    isLong   = strategy.position_size > 0
+    k = usePct ? entryPx / 100.0 : 1.0     // 1% giá vào = k điểm giá (chế độ điểm: k = 1)
+    float risk = na
+    if useCandleSL
+        risk := math.abs(entryPx - pendingSL)
+    else
+        risk := (usePct ? slPct : slPoints) * k
+    trStartEff := (usePct ? trailStartPct : trailStart) * k
+    lockEff    := (usePct ? lockPct : lockPts) * k
+    stepEff    := math.max((usePct ? trailStepPct : trailStep) * k, syminfo.mintick)
+    risk := math.max(risk, syminfo.mintick)
+    slPrice := isLong ? entryPx - risk : entryPx + risk
+    tpPrice := isLong ? entryPx + risk * rr : entryPx - risk * rr
+    bestPx  := entryPx
+
+// ===== TRAILING: NÂNG SL THEO BẬC =====
+if useTrail and strategy.position_size != 0
+    if strategy.position_size > 0
+        bestPx := math.max(bestPx, high)
+        profit = bestPx - entryPx
+        if profit >= trStartEff
+            steps  = math.floor((profit - trStartEff) / stepEff)
+            newSL  = entryPx + lockEff + steps * stepEff
+            slPrice := math.max(slPrice, newSL)      // Long: chỉ nâng SL lên
+    else
+        bestPx := math.min(bestPx, low)
+        profit = entryPx - bestPx
+        if profit >= trStartEff
+            steps  = math.floor((profit - trStartEff) / stepEff)
+            newSL  = entryPx - lockEff - steps * stepEff
+            slPrice := math.min(slPrice, newSL)      // Short: chỉ hạ SL xuống
+
+// ===== THOÁT LỆNH =====
+tpUse = (useTrail and removeTP) ? na : tpPrice
+if strategy.position_size > 0
+    strategy.exit("Exit L", "Long", stop=slPrice, limit=tpUse)
+if strategy.position_size < 0
+    strategy.exit("Exit S", "Short", stop=slPrice, limit=tpUse)
+
+if isCloseTime
+    strategy.close_all(comment="EOD")
+
+if strategy.position_size == 0
+    slPrice := na
+    tpPrice := na
+    bestPx  := na
+
+// ===== PHÍ + THUẾ: TỰ NHẬN THEO LOẠI SẢN PHẨM (mã tự tính, xem trong Data Window) =====
+stockFeeSide = input.float(0.3, "CP: phí mỗi chiều (%)", minval=0.0, step=0.05, group="Phí & thuế")
+stockTax     = input.float(0.1, "CP: thuế bán (%)", minval=0.0, step=0.05, group="Phí & thuế")
+futRoundTrip = input.float(0.5, "Phái sinh: phí + thuế cả vòng (điểm)", minval=0.0, step=0.1, group="Phí & thuế")
+futPointVnd  = input.float(100000, "Phái sinh: VND mỗi điểm", minval=1, group="Phí & thuế")
+
+var float netPnl  = 0.0
+var float feeSum  = 0.0
+var int   winCnt  = 0
+var int   doneCnt = 0
+
+while doneCnt < strategy.closedtrades
+    ep   = strategy.closedtrades.entry_price(doneCnt)
+    xp   = strategy.closedtrades.exit_price(doneCnt)
+    qs   = strategy.closedtrades.size(doneCnt)
+    aq   = math.abs(qs)
+    dirn = qs > 0 ? 1.0 : -1.0
+    float gross = na
+    float fee   = na
+    if usePct
+        gross := (xp - ep) * dirn * aq
+        fee   := (ep + xp) * aq * stockFeeSide / 100.0 + xp * aq * stockTax / 100.0
+    else
+        gross := (xp - ep) * dirn * aq * futPointVnd
+        fee   := futRoundTrip * aq * futPointVnd
+    netTrade = gross - fee
+    netPnl  += netTrade
+    feeSum  += fee
+    winCnt  += netTrade > 0 ? 1 : 0
+    doneCnt += 1
+
+plot(netPnl, "Lãi ròng sau phí (VND)", display=display.data_window)
+plot(feeSum, "Tổng phí + thuế (VND)", display=display.data_window)
+
+// ===== HIỂN THỊ =====
+plot(slPrice, "SL", color=color.red,   style=plot.style_linebr)
+plot(tpUse,   "TP", color=color.green, style=plot.style_linebr)
+plotshape(longOK  and strategy.position_size == 0, "Long",  shape.triangleup,   location.belowbar, color.green, size=size.tiny)
+plotshape(shortOK and strategy.position_size == 0, "Short", shape.triangledown, location.abovebar, color.red,   size=size.tiny)
+</script>
+<script>
+(function(){
+var code=document.getElementById('src').textContent.replace(/^\n/,'');
+document.getElementById('pre').textContent=code;
+var b=document.getElementById('cp');
+function done(ok){b.textContent=ok?'Đã sao chép':'Hãy bôi đen và chép thủ công';setTimeout(function(){b.textContent='Sao chép mã'},2200)}
+function fallback(){try{var r=document.createRange();r.selectNodeContents(document.getElementById('pre'));var s=getSelection();s.removeAllRanges();s.addRange(r);done(document.execCommand('copy'))}catch(e){done(false)}}
+b.addEventListener('click',function(){
+try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(function(){done(true)},fallback)}else{fallback()}}catch(e){fallback()}
+});
+})();
+</script>
+</body>
+</html>
